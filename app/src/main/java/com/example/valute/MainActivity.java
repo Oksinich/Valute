@@ -37,6 +37,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,6 +47,7 @@ import retrofit2.Retrofit;
 public class MainActivity extends Activity implements ValuteAdapter.OnValuteListener{
     RecyclerView rec;
     ValuteAdapter adapter;
+    DataTask task=null;
     List<OneValute> oneValutes = new ArrayList<>();;
     FloatingActionButton fl;
 
@@ -57,16 +59,19 @@ public class MainActivity extends Activity implements ValuteAdapter.OnValuteList
         rec = findViewById(R.id.rec);
         fl = findViewById(R.id.floatingActionButton);
 
-        DataTask task = new DataTask();
+        task = new DataTask();
         task.execute();
 
         fl.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                task.execute();
+                task.cancel(true);
+                task.cancel(false);
+                Toast.makeText(getApplicationContext(),"Данные обновлены",Toast.LENGTH_SHORT).show();
             }
         });
     }
+
 
 
     @Override
@@ -79,17 +84,23 @@ public class MainActivity extends Activity implements ValuteAdapter.OnValuteList
 
     class DataTask extends AsyncTask<Void,Void,Void>{
 
+
         @Override
         protected Void doInBackground(Void... voids) {
-            try {
-                JSONObject json = readJsonFromUrl("https://www.cbr-xml-daily.ru/daily_json.js");
-                getKeysJSOB(json.toString(),"Valute");
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+              if (isCancelled())
+                  return null;
+                  try {
+                    JSONObject json = readJsonFromUrl("https://www.cbr-xml-daily.ru/daily_json.js");
+                    getKeysJSOB(json.toString(),"Valute");
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
             return null;
         }
 
@@ -97,6 +108,7 @@ public class MainActivity extends Activity implements ValuteAdapter.OnValuteList
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             setAdapter();
+
         }
     }
 
