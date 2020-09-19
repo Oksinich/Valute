@@ -1,9 +1,5 @@
 package com.example.valute;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
-import java.text.DecimalFormat;
 
 public class OneValute {
 
